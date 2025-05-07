@@ -1,63 +1,48 @@
-/*Qeustion 1: Converting the ProductDetail table to 1NF.
-Create a new table to store the 1NF compliant data.*/
-CREATE TABLE ProductDetail_1NF (
-    OrderID INT,
-    CustomerName VARCHAR(255),
-    Product VARCHAR(255)
+use sampledb;
+-- Question 1 Achieving 1NF (First Normal Form).
+
+-- Create the ProductDetail Table
+CREATE TABLE ProductDetail(
+OrderID INT,
+CustomerName VARCHAR(100),
+Products VARCHAR(100)
 );
 
--- Insert data into the new table, splitting the Products column into individual rows.
-INSERT INTO ProductDetail_1NF (OrderID, CustomerName, Product)
-SELECT
-    OrderID,
-    CustomerName,
-    TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(Products, ',', n), ',', -1)) AS Product
-FROM ProductDetail
-CROSS JOIN (
-    SELECT 1 AS n UNION ALL
-    SELECT 2 UNION ALL
-    SELECT 3 UNION ALL
-    SELECT 4 UNION ALL
-) AS numbers
-WHERE n <= LENGTH(Products) - LENGTH(REPLACE(Products, ',', '')) + 1;
+-- Insert Data into the ProductDetail Table. 
+INSERT INTO ProductDetail (OrderID, CustomerName,Products)
+VALUES 
+(101, 'John Doe', 'Laptop'),
+(101, 'John Doe', 'Laptop'),
+(102, 'Jane Smith', 'Tablet'),
+(102, 'Jane Smith', 'Keyboard'),
+(102, 'Jane Smith', 'Mouse'),
+(103, 'Emily Clark', 'Phone');
 
--- Drop the original table
-DROP TABLE ProductDetail;
-
--- Rename the new table to the original table name.
-ALTER TABLE ProductDetail_1NF RENAME TO ProductDetail;
-
--- Select all data from the new table
+-- Retrieve the data from the ProductDetail table.
 SELECT * FROM ProductDetail;
 
-/*Question 2: Converting the OrderDetails table into 2NF by removing partial dependencies. 
-Create a new table for Customers (to remove the partial dependency)*/
-CREATE TABLE Customers (
-    OrderID INT PRIMARY KEY,
-    CustomerName VARCHAR(255)
-);
+-- Question 2 Achieving 2NF (Second Normal Form). 
 
--- Insert distinct OrderID and CustomerName pairs into the Customers table.
-INSERT INTO Customers (OrderID, CustomerName)
-SELECT DISTINCT OrderID, CustomerName
-FROM OrderDetails;
+-- Insert data into the Orders Table.
+INSERT INTO orders(OrderID, CustomerName)
+Values (101,'John Doe')
+(101,'Jane Doe')
+(101,'John Doe')
 
--- Create a new table for OrderDetails without CustomerName.
-CREATE TABLE OrderDetails_2NF (
-    OrderID INT,
-    Product VARCHAR(255),
-    Quantity INT,
-    PRIMARY KEY (OrderID, Product),
-    FOREIGN KEY (OrderID) REFERENCES Customers(OrderID)
-);
+-- Create the product table.
+Create Table products (
+Product_ID Int primary key
+ProductName
+Quantity
+OrderID
+FOREIGN KEY (OrderID) REFERENCES Orders(OrderID));
 
--- Insert the remaining data into the OrderDetails_2NF table.
-INSERT INTO OrderDetails_2NF (OrderID, Product, Quantity)
-SELECT
-    OrderID,
-    Product,
-    Quantity
-FROM OrderDetails;
--- Select all data from the new tables to show the result.
-SELECT * FROM Customers;
-SELECT * FROM OrderDetails_2NF;
+-- Insert the data into the product table.
+INSERT INTO Products (Product_ID, ProductName, Quantity)
+values 
+(1,'Laptop', 2,101),
+(2,'Mouse', 1, 101),
+(3,'Tablet', 1, 103),
+(4,'Keyboard', 1, 102),
+(5,'Mouse', 1, 102),
+(6,'Phone', 1, 103);
